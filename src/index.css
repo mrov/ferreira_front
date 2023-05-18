@@ -14,6 +14,10 @@
   -webkit-text-size-adjust: 100%;
 }
 
+body {
+  margin: 0px !important;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -21,14 +25,6 @@ a {
 }
 a:hover {
   color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
 }
 
 h1 {
@@ -55,7 +51,9 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
+
+/* TODO Try to understand this color-scheme */
+@media (prefers-color-scheme: dark) {
   :root {
     color: #213547;
     background-color: #ffffff;

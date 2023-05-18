@@ -1,20 +1,19 @@
-const login = (username: string, password: string) => {
+const login = (login: string, password: string) => {
     const formData = {
-      username,
+      login,
       password,
     };
   
-    return fetch('https://api.example.com/login', {
+    return fetch('https://localhost:7059/api/Auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(formData),
     })
-      .then((response) => response.json())
-      .then((data) => {
+      .then((response) => {
         // Handle the API response
-        return data;
+        return response;
       })
       .catch((error) => {
         // Handle any error that occurred during the request

@@ -1,17 +1,21 @@
-import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import { TextField } from "@mui/material";
+// Core
 import { useState } from "react";
-import authService from '../services/AuthService';
+import { useNavigate } from "react-router-dom";
 
-import reactLogo from '../assets/react.svg'
+// Components
+import { Typography, Button, CardContent, Card, Box, TextField } from "@mui/material";
+
+// Services
+import authService from "../services/AuthService";
+
+// Assets
+import ferreiraLogo from "../assets/fc-big-icon.png";
+import "../index.css";
 
 function Login() {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleLoginChange = (event: any) => {
     setLogin(event.target.value);
@@ -27,54 +31,59 @@ function Login() {
     try {
       const response = await authService.login(login, password);
       // Handle the API response
-      console.log(response);
+      if (response.status === 200) {
+        // Redirect to user list
+        navigate("/users");
+      }
     } catch (error) {
-      // Handle any error that occurred during the request
+      // TODO show error when fail to login
       console.error(error);
     }
   };
 
   return (
     <>
-      <Box sx={{ minWidth: 275 }}>
-        <Card variant="outlined">
-          <CardContent>
-            <img src={reactLogo} className="logo react" alt="React logo" />
-            <Typography variant="h5" align="center">
-              Login
-            </Typography>
-            <form onSubmit={handleFormSubmit}>
-              <TextField
-                label="Login"
-                fullWidth
-                margin="normal"
-                value={login}
-                onChange={handleLoginChange}
-              />
-              <TextField
-                label="Password"
-                fullWidth
-                margin="normal"
-                type="password"
-                value={password}
-                onChange={handlePasswordChange}
-              />
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                fullWidth
-              >
+      <div style={{width: '100%', height: "100vh", display: "flex", justifyContent: "center", alignItems: "center"}}>
+        <Box sx={{ minWidth: 275, maxWidth: "30%", textAlign: "center" }}>
+          <Card variant="outlined">
+            <CardContent>
+              <img height={"70%"} src={ferreiraLogo} alt="Ferreira Costa Logo" />
+              <Typography variant="h6" align="center">
                 Login
-              </Button>
-            </form>
-            <Typography align="center">
-              <a href="#">Forgot password?</a>
-            </Typography>
-            {login}
-          </CardContent>
-        </Card>
-      </Box>
+              </Typography>
+              <form onSubmit={handleFormSubmit}>
+                <TextField
+                  label="Login"
+                  fullWidth
+                  margin="normal"
+                  value={login}
+                  onChange={handleLoginChange}
+                />
+                <TextField
+                  label="Password"
+                  fullWidth
+                  margin="normal"
+                  type="password"
+                  value={password}
+                  onChange={handlePasswordChange}
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  fullWidth
+                >
+                  Login
+                </Button>
+              </form>
+              <Typography align="center">
+                <a href="#">Forgot password?</a>
+              </Typography>
+              {login}
+            </CardContent>
+          </Card>
+        </Box>
+      </div>
     </>
   );
 }
