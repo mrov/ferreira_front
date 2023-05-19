@@ -3,7 +3,11 @@ import Logo from '../../assets/fc-small-icon.png';
 import { AppBar, Avatar, Button, IconButton, TextField, Toolbar, Typography } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 
+import { useNavigate } from "react-router-dom";
+
 const Header = () => {
+  const navigate = useNavigate();
+
   return (
     <AppBar position="sticky">
       <Toolbar >
@@ -14,7 +18,7 @@ const Header = () => {
             <Avatar alt="User" src="" />
         </IconButton>
         {/* TODO Logout action */}
-        <Button variant="contained" color='primary' endIcon={<LogoutIcon />}>
+        <Button onClick={() => {navigate("/login")}} variant="contained" color='primary' endIcon={<LogoutIcon />}>
             Logout
         </Button>
       </Toolbar>

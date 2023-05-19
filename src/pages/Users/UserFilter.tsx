@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { TextField, Grid, Button, MenuItem } from "@mui/material";
+import { TextField, Grid, Button, MenuItem, InputAdornment } from "@mui/material";
 import IUserFilter from '../../utils/interfaces/IUserFilter';
 import { Status } from '../../utils/interfaces/IUserFilter';
+import EventIcon from '@mui/icons-material/Event';
 
 
 interface UserFilterProps {
