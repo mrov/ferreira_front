@@ -56,6 +56,7 @@ function User() {
     }
   };
 
+  // TODO Create a modal to confirm the delete all action
   const deleteAllHandler = async () => {
     await deleteAllUsers();
   };

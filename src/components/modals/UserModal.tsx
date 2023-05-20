@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Button, Modal, TextField, MenuItem, Card, Grid } from "@mui/material";
 import { IUserForm, Status } from "../../utils/interfaces/IUser";
 import { createUser } from "../../services/UsersService";
+import authService from "../../services/AuthService";
+import { useNavigate } from "react-router-dom";
 
 interface IUserModalProps {
   open: boolean;
@@ -23,12 +25,15 @@ const UserModal: React.FC<IUserModalProps> = ({ open, onClose }) => {
   const [userForm, setUserForm] = useState<IUserForm>({
     name: "",
     login: "",
+    password: "",
     email: "",
     phone: "",
     cpf: "",
     dateOfBirth: "",
     motherName: "",
   });
+
+  const navigate = useNavigate();
 
   const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -38,9 +43,31 @@ const UserModal: React.FC<IUserModalProps> = ({ open, onClose }) => {
     }));
   };
 
+  const handleFormSubmit = async () => {
+    try {
+      const response = await authService.login(
+        userForm.login,
+        userForm.password
+      );
+      if (response.status === 200) {
+        // Redirect to user list
+        navigate("/users");
+      } else {
+        throw Error(String(response.status));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleSubmit = async () => {
     await createUser(userForm);
-    onClose();
+
+    await handleFormSubmit();
+
+    setTimeout(() => {
+      onClose();
+    }, 1000);
   };
 
   return (
@@ -73,6 +100,7 @@ const UserModal: React.FC<IUserModalProps> = ({ open, onClose }) => {
             <TextField
               name="password"
               label="Password"
+              type="password"
               value={userForm.password}
               onChange={handleFieldChange}
               fullWidth
