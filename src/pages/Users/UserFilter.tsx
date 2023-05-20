@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
-import { TextField, Grid, Button, MenuItem, InputAdornment } from "@mui/material";
-import IUserFilter from '../../utils/interfaces/IUserFilter';
-import { Status } from '../../utils/interfaces/IUserFilter';
-import EventIcon from '@mui/icons-material/Event';
-
+import React, { useEffect, useState } from "react";
+import {
+  TextField,
+  Grid,
+  Button,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  InputLabel,
+  FormControl,
+} from "@mui/material";
+import IUserFilter from "../../utils/interfaces/IUserFilter";
+import { Status } from "../../utils/interfaces/IUser";
 
 interface UserFilterProps {
   onFilter: (filters: IUserFilter) => void;
@@ -12,14 +19,18 @@ interface UserFilterProps {
 const UserFilter: React.FC<UserFilterProps> = ({ onFilter }) => {
   const [filters, setFilters] = useState<IUserFilter>({});
 
+  useEffect(() => {
+    setFilters({ status: Status.Active });
+  }, []);
+
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
   };
 
-  const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleStatusChange = (event: SelectChangeEvent) => {
     const { value } = event.target;
-    setFilters((prevFilters) => ({ ...prevFilters, status: parseInt(value) }));
+    setFilters((prevFilters) => ({ ...prevFilters, status: value }));
   };
 
   const handleApplyFilter = () => {
@@ -27,15 +38,33 @@ const UserFilter: React.FC<UserFilterProps> = ({ onFilter }) => {
   };
 
   return (
-    <Grid container spacing={2} paddingY={4}>
+    <Grid container spacing={2} paddingBottom={3}>
       <Grid item xs={12} sm={6} md={4} lg={3}>
-        <TextField name="name" label="Name" fullWidth value={filters.name || ''} onChange={handleFilterChange} />
+        <TextField
+          name="name"
+          label="Name"
+          fullWidth
+          value={filters.name || ""}
+          onChange={handleFilterChange}
+        />
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>
-        <TextField name="login" label="Login" fullWidth value={filters.login || ''} onChange={handleFilterChange} />
+        <TextField
+          name="login"
+          label="Login"
+          fullWidth
+          value={filters.login || ""}
+          onChange={handleFilterChange}
+        />
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>
-        <TextField name="cpf" label="CPF" fullWidth value={filters.cpf || ''} onChange={handleFilterChange} />
+        <TextField
+          name="cpf"
+          label="CPF"
+          fullWidth
+          value={filters.cpf || ""}
+          onChange={handleFilterChange}
+        />
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>
         <TextField
@@ -43,7 +72,7 @@ const UserFilter: React.FC<UserFilterProps> = ({ onFilter }) => {
           label="Start Date of Birth"
           type="date"
           fullWidth
-          value={filters.startDateBirth || ''}
+          value={filters.startDateBirth || ""}
           onChange={handleFilterChange}
           InputLabelProps={{ shrink: true }}
         />
@@ -54,7 +83,7 @@ const UserFilter: React.FC<UserFilterProps> = ({ onFilter }) => {
           label="End Date of Birth"
           type="date"
           fullWidth
-          value={filters.endDateBirth || ''}
+          value={filters.endDateBirth || ""}
           onChange={handleFilterChange}
           InputLabelProps={{ shrink: true }}
         />
@@ -65,7 +94,7 @@ const UserFilter: React.FC<UserFilterProps> = ({ onFilter }) => {
           label="Start Inserted At"
           type="date"
           fullWidth
-          value={filters.startInsertedAt || ''}
+          value={filters.startInsertedAt || ""}
           onChange={handleFilterChange}
           InputLabelProps={{ shrink: true }}
         />
@@ -76,7 +105,7 @@ const UserFilter: React.FC<UserFilterProps> = ({ onFilter }) => {
           label="End Inserted At"
           type="date"
           fullWidth
-          value={filters.endInsertedAt || ''}
+          value={filters.endInsertedAt || ""}
           onChange={handleFilterChange}
           InputLabelProps={{ shrink: true }}
         />
@@ -87,7 +116,7 @@ const UserFilter: React.FC<UserFilterProps> = ({ onFilter }) => {
           label="Start Updated At"
           type="date"
           fullWidth
-          value={filters.startUpdatedAt || ''}
+          value={filters.startUpdatedAt || ""}
           onChange={handleFilterChange}
           InputLabelProps={{ shrink: true }}
         />
@@ -98,31 +127,44 @@ const UserFilter: React.FC<UserFilterProps> = ({ onFilter }) => {
           label="End Updated At"
           type="date"
           fullWidth
-          value={filters.endUpdatedAt || ''}
+          value={filters.endUpdatedAt || ""}
           onChange={handleFilterChange}
           InputLabelProps={{ shrink: true }}
         />
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>
-        <TextField name="startAge" label="Start Age" fullWidth value={filters.startAge || ''} onChange={handleFilterChange} />
+        <TextField
+          name="startAge"
+          label="Start Age"
+          fullWidth
+          value={filters.startAge || ""}
+          onChange={handleFilterChange}
+        />
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>
-        <TextField name="endAge" label="End Age" fullWidth value={filters.endAge || ''} onChange={handleFilterChange} />
+        <TextField
+          name="endAge"
+          label="End Age"
+          fullWidth
+          value={filters.endAge || ""}
+          onChange={handleFilterChange}
+        />
       </Grid>
       {/* TODO status not showing when i select inactive */}
       <Grid item xs={12} sm={6} md={4} lg={3}>
-        <TextField
-          name="status"
-          label="Status"
-          select
-          fullWidth
-          value={filters.status || ''}
-          onChange={handleStatusChange}
-        >
-          <MenuItem value={Status.Inactive}>Inactive</MenuItem>
-          <MenuItem value={Status.Active}>Active</MenuItem>
-          <MenuItem value={Status.Blocked}>Blocked</MenuItem>
-        </TextField>
+        <FormControl fullWidth>
+          <InputLabel id="demo-simple-select-label">Status</InputLabel>
+          <Select
+            name="status"
+            label="Status"
+            value={filters.status || ""}
+            onChange={handleStatusChange}
+          >
+            <MenuItem value={Status.Inactive}>Inactive</MenuItem>
+            <MenuItem value={Status.Active}>Active</MenuItem>
+            <MenuItem value={Status.Blocked}>Blocked</MenuItem>
+          </Select>
+        </FormControl>
       </Grid>
       <Grid item xs={12}>
         <Button variant="contained" color="primary" onClick={handleApplyFilter}>

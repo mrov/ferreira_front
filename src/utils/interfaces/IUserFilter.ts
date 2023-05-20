@@ -1,3 +1,5 @@
+import { Status } from "./IUser";
+
 export default interface IUserFilter  {
     name?: string;
     login?: string;
@@ -14,10 +16,4 @@ export default interface IUserFilter  {
     pageNumber?: number;
   }
 
-  enum Status {
-    Inactive = 0,
-    Active = 1,
-    Blocked = 2
-  }
-
-  export {Status}
+  

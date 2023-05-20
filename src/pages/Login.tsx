@@ -20,6 +20,7 @@ import authService from "../services/AuthService";
 import ferreiraLogo from "../assets/fc-big-icon.png";
 import "../index.css";
 import ForgotPasswordModal from "../components/modals/ForgotPasswordModal";
+import UserModal from "../components/modals/UserModal";
 
 function Login() {
   const [login, setLogin] = useState("");
@@ -27,11 +28,15 @@ function Login() {
   const [loginError, setLoginError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
-  // ForgotPassword states
+  // ForgotPasswordModal states
   const [openModal, setOpenModal] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [newPassword, setNewPassword] = useState("");
+
+  // CreateUserModal States
+  const [createUserModal, setcreateUserModal] = useState(false);
+
 
   const navigate = useNavigate();
 
@@ -94,6 +99,11 @@ function Login() {
           
         }}
       />
+
+      <UserModal open={createUserModal} onClose={function (): void {
+        setcreateUserModal(false);
+      } } />
+
       <div
         style={{
           width: "100%",
@@ -182,6 +192,14 @@ function Login() {
                   onClick={() => setOpenModal(true)}
                 >
                   Forgot password?
+                </a>
+              </Typography>
+              <Typography align="center" sx={{ pt: 2 }}>
+                <a
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setcreateUserModal(true)}
+                >
+                  Create account
                 </a>
               </Typography>
             </CardContent>
