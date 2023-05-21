@@ -10,7 +10,7 @@ import { IUser, IUserPagination, Status } from "../../utils/interfaces/IUser";
 import { useEffect, useState } from "react";
 import IUserFilter from "../../utils/interfaces/IUserFilter";
 
-import { deleteAllUsers, getUserData } from "../../services/UsersService";
+import { deleteAllUsers, editUserStatus, getUserData } from "../../services/UsersService";
 import { Button, Card, Grid } from "@mui/material";
 
 import CreateIcon from "@mui/icons-material/Create";
@@ -99,8 +99,9 @@ function User() {
         onClose={function (): void {
           setOpenDeleteModal(false);
         }}
-        onDelete={function (): void {
-          fetchUserData();
+        onDelete={async function (): Promise<void> {
+          await fetchUserData();
+          console.log('a')
           setOpenDeleteModal(false);
         }}
       />
@@ -109,6 +110,7 @@ function User() {
         user={selectedUser}
         open={openUserModal}
         onClose={function (): void {
+          fetchUserData();
           setOpenUserModal(false);
         }}
       />
@@ -189,9 +191,10 @@ function User() {
                     ) : (
                       <TableCell key={"RestoreFromTrashIcon"} align="center">
                         <div
-                          onClick={() => {
-                            setOpenDeleteModal(true);
-                            setSelectedUser(user);
+                          onClick={async () => {
+                            await editUserStatus(user, Status.Active);
+                            console.log('a')
+                            fetchUserData();
                           }}
                         >
                           <RestoreFromTrashIcon

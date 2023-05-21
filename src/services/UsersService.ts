@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import IUserFilter from "../utils/interfaces/IUserFilter";
-import { IUser, IUserPagination, IUserForm } from "../utils/interfaces/IUser";
+import { IUser, IUserPagination, IUserForm, Status } from "../utils/interfaces/IUser";
 
 const API_URL = 'https://localhost:7059';
 
@@ -35,36 +35,42 @@ const editUser = async (userData: Partial<IUserForm>) => {
     return response.data;
   } catch (error) {
     console.error(error);
-    throw new Error('Failed to create user');
+    throw new Error('Failed to Edit user');
   }
 };
 
-const deleteUser = async (userId: string) => {
-  // Make the API call to delete the user
-  axios.delete(`${API_URL}/api/User/${userId}`)
-  .then((response) => {
-    // Handle the response as needed
-    console.log(response);
-    return response;
-  })
-  .catch((error) => {
-    // Handle the error as needed
+const editUserStatus = async (userData: Partial<IUserForm>, status: Status) => {
+  try {
+    const response = await axios.put(`${API_URL}/Api/User/${userData.id}/Status`, { Status: Number(status)});
+    return response.data;
+  } catch (error) {
     console.error(error);
-  });
+    throw new Error('Failed to Edit user status');
+  }
 };
 
-const deleteAllUsers = async () => {
-  // Make the API call to delete the users
-  axios.delete(`${API_URL}/Api/User/DeleteAll`)
-  .then((response) => {
-    // Handle the response as needed
-    console.log(response);
+const deleteUser = async (userId: string) : Promise<AxiosResponse> => {
+  try {
+    const response = await axios.delete(`${API_URL}/api/User/${userId}`);
     return response;
-  })
-  .catch((error) => {
-    // Handle the error as needed
+    // Process the response data here
+  } catch (error) {
     console.error(error);
-  });
+    // Handle error here
+    throw error;
+  }
 };
 
-export { getUserData, createUser, editUser, deleteUser, deleteAllUsers };
+const deleteAllUsers = async ()  : Promise<AxiosResponse> => {
+  try {
+    const response = await axios.delete(`${API_URL}/Api/User/DeleteAll`)
+    return response;
+    // Process the response data here
+  } catch (error) {
+    console.error(error);
+    // Handle error here
+    throw error;
+  }
+};
+
+export { getUserData, createUser, editUser, editUserStatus, deleteUser, deleteAllUsers };

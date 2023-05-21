@@ -33,6 +33,7 @@ const UserFilter: React.FC<UserFilterProps> = ({ onFilter }) => {
     setFilters((prevFilters) => ({ ...prevFilters, startAge: startAge, endAge: endAge }));
   };
 
+  // TODO create a all filter to get every status
   const handleStatusChange = (event: SelectChangeEvent) => {
     const { value } = event.target;
     setFilters((prevFilters) => ({ ...prevFilters, status: value }));

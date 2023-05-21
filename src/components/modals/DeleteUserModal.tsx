@@ -1,25 +1,31 @@
-import React, { useState } from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import React, { useState } from "react";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
 import { deleteUser } from "../../services/UsersService";
 
 interface DeleteUserModalProps {
-  userId: string | number | undefined,
+  userId: string | number | undefined;
   open: boolean;
   onClose: () => void;
   onDelete: () => void;
 }
 
-function DeleteUserModal({ userId, open, onClose, onDelete } : DeleteUserModalProps) {
-
+function DeleteUserModal({
+  userId,
+  open,
+  onClose,
+  onDelete,
+}: DeleteUserModalProps) {
   const handleDelete = async () => {
-    await deleteUser(String(userId));
-    onDelete();
+    const response = await deleteUser(String(userId));
+    if (response.status === 200) {
+      onDelete();
+    }
   };
 
   return (
