@@ -13,15 +13,25 @@ interface IUser {
   updatedAt: string;
 }
 
+// For the edit and create modal
 interface IUserForm {
+  id: number | string;
   name: string;
   login: string;
-  password: string;
+  password?: string;
   email: string;
   phone: string;
   cpf: string;
   dateOfBirth: string;
   motherName: string;
+}
+
+interface IUserPagination {
+  totalUsers: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+  users: IUser[];
 }
 
 enum Status {
@@ -30,5 +40,5 @@ enum Status {
   Blocked = "2",
 }
 
-export { Status };  export type { IUser, IUserForm };
+export { Status };  export type { IUser, IUserForm, IUserPagination };
 

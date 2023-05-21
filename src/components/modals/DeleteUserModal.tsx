@@ -8,10 +8,17 @@ import DialogTitle from '@mui/material/DialogTitle';
 
 import { deleteUser } from "../../services/UsersService";
 
-function DeleteUserModal({ userId, open, onClose, onDelete }: any) {
+interface DeleteUserModalProps {
+  userId: string | number | undefined,
+  open: boolean;
+  onClose: () => void;
+  onDelete: () => void;
+}
+
+function DeleteUserModal({ userId, open, onClose, onDelete } : DeleteUserModalProps) {
 
   const handleDelete = async () => {
-    await deleteUser(userId);
+    await deleteUser(String(userId));
     onDelete();
   };
 

@@ -1,12 +1,12 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import IUserFilter from "../utils/interfaces/IUserFilter";
-import { IUser, IUserForm } from "../utils/interfaces/IUser";
+import { IUser, IUserPagination, IUserForm } from "../utils/interfaces/IUser";
 
 const API_URL = 'https://localhost:7059';
 
-const getUserData = async (filter: IUserFilter) => {
+const getUserData = async (filter: IUserFilter) : Promise<AxiosResponse<IUserPagination>> => {
   try {
-    const response = await axios.get(`${API_URL}/Api/User`, {
+    const response = await axios.get<IUserPagination>(`${API_URL}/Api/User`, {
       params: filter,
     });
 
@@ -15,12 +15,23 @@ const getUserData = async (filter: IUserFilter) => {
   } catch (error) {
     console.error(error);
     // Handle error here
+    throw error;
   }
 };
 
-const createUser = async (userData: IUserForm) => {
+const createUser = async (userData: Partial<IUserForm>) => {
   try {
     const response = await axios.post(`${API_URL}/Api/User`, userData);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw new Error('Failed to create user');
+  }
+};
+
+const editUser = async (userData: Partial<IUserForm>) => {
+  try {
+    const response = await axios.put(`${API_URL}/Api/User/${userData.id}`, userData);
     return response.data;
   } catch (error) {
     console.error(error);
@@ -56,4 +67,4 @@ const deleteAllUsers = async () => {
   });
 };
 
-export { getUserData, createUser, deleteUser, deleteAllUsers };
+export { getUserData, createUser, editUser, deleteUser, deleteAllUsers };

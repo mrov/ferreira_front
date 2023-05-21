@@ -6,7 +6,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Header from "../../components/shared/Header";
 import UserFilter from "./UserFilter";
-import { IUser, Status } from "../../utils/interfaces/IUser";
+import { IUser, IUserPagination, Status } from "../../utils/interfaces/IUser";
 import { useEffect, useState } from "react";
 import IUserFilter from "../../utils/interfaces/IUserFilter";
 
@@ -18,6 +18,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import RestoreFromTrashIcon from "@mui/icons-material/RestoreFromTrash";
 
 import DeleteUserModal from "../../components/modals/DeleteUserModal";
+import UserModal from "../../components/modals/UserModal";
+import Pagination from "../../components/shared/Pagination";
+import { getStatusName } from "../../utils/functions/UserUtils";
 
 function mapColumns(user: any): string[] {
   const columns: string[] = [];
@@ -31,12 +34,17 @@ function mapColumns(user: any): string[] {
 
 function User() {
   const [users, setUsers] = useState<IUser[]>([]);
+  const [pagination, setPagination] =
+    useState<Omit<IUserPagination, "users">>();
   const [columns, setColumns] = useState<string[]>([]);
-  const [openModal, setOpenModal] = useState(false);
   const [filters, setFilters] = useState<IUserFilter>({
     status: Status.Active,
   });
-  const [selectedUserId, setSelectedUserId] = useState("");
+
+  // Modals Infos
+  const [openUserModal, setOpenUserModal] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<Partial<IUser>>({});
 
   useEffect(() => {
     fetchUserData();
@@ -47,8 +55,10 @@ function User() {
       const response = await getUserData(filters);
 
       if (response?.status === 200) {
-        setUsers(response?.data);
-        setColumns(mapColumns(response?.data[0]));
+        const { users, ...paginationInfo } = response.data;
+        setUsers(users);
+        setPagination(paginationInfo);
+        setColumns(mapColumns(users[0]));
       }
     } catch (error) {
       console.error(error);
@@ -61,17 +71,45 @@ function User() {
     await deleteAllUsers();
   };
 
+  const renderProperty = (
+    userId: string | number,
+    value: string | number,
+    property: string
+  ) => {
+    if (property === "status") {
+      return (
+        <TableCell key={userId + property} align="center">
+          {getStatusName(String(value))}
+        </TableCell>
+      );
+    } else {
+      return (
+        <TableCell key={userId + property} align="center">
+          {value}
+        </TableCell>
+      );
+    }
+  };
+
   return (
     <>
       <DeleteUserModal
-        userId={selectedUserId}
-        open={openModal}
+        userId={selectedUser.id}
+        open={openDeleteModal}
         onClose={function (): void {
-          setOpenModal(false);
+          setOpenDeleteModal(false);
         }}
         onDelete={function (): void {
           fetchUserData();
-          setOpenModal(false);
+          setOpenDeleteModal(false);
+        }}
+      />
+
+      <UserModal
+        user={selectedUser}
+        open={openUserModal}
+        onClose={function (): void {
+          setOpenUserModal(false);
         }}
       />
 
@@ -86,16 +124,16 @@ function User() {
           />
         </Grid>
 
-        <TableContainer component={Card}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                {columns.map((column) => (
-                  <TableCell align="center" key={column}>
-                    {column}
-                  </TableCell>
-                ))}
-                {users.length ? (
+        {users.length ? (
+          <TableContainer component={Card}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  {columns.map((column) => (
+                    <TableCell align="center" key={column}>
+                      {column}
+                    </TableCell>
+                  ))}
                   <>
                     <TableCell align="center" key={"EditHeader"}>
                       Edit
@@ -104,60 +142,84 @@ function User() {
                       Delete
                     </TableCell>
                   </>
-                ) : (
-                  <></>
-                )}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {users.map((user: IUser) => (
-                <TableRow
-                  key={user.id}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  {Object.keys(user).map((property) => (
-                    <TableCell key={user.id + property} align="center">
-                      {user[property as keyof IUser] as string}
-                    </TableCell>
-                  ))}
-                  <TableCell key={"EditPencil"} align="center">
-                    <CreateIcon sx={{ cursor: "pointer" }} htmlColor="blue" />
-                  </TableCell>
-                  {String(user.status) === Status.Active ? (
-                    <TableCell key={"DeleteIcon"} align="center">
-                      <div
-                        onClick={() => {
-                          setOpenModal(true);
-                          setSelectedUserId(user.id);
-                        }}
-                      >
-                        <DeleteIcon
-                          sx={{ cursor: "pointer" }}
-                          htmlColor="Red"
-                        />
-                      </div>
-                    </TableCell>
-                  ) : (
-                    <TableCell key={"RestoreFromTrashIcon"} align="center">
-                      <div
-                        onClick={() => {
-                          setOpenModal(true);
-                          setSelectedUserId(user.id);
-                        }}
-                      >
-                        <RestoreFromTrashIcon
-                          sx={{ cursor: "pointer" }}
-                          htmlColor="green"
-                        />
-                      </div>
-                    </TableCell>
-                  )}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <Button variant="contained" color="primary">
+              </TableHead>
+              <TableBody>
+                {users.map((user: IUser) => (
+                  <TableRow
+                    key={user.id}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    {Object.keys(user).map((property) =>
+                      renderProperty(
+                        user.id,
+                        user[property as keyof IUser],
+                        property
+                      )
+                    )}
+
+                    {/* TODO Turn this region another component Actions Region (Edit/Delete/Rrcover User) */}
+                    <TableCell key={"EditPencil"} align="center">
+                      <div
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setOpenUserModal(true);
+                        }}
+                      >
+                        <CreateIcon
+                          sx={{ cursor: "pointer" }}
+                          htmlColor="blue"
+                        />
+                      </div>
+                    </TableCell>
+                    {String(user.status) === Status.Active ? (
+                      <TableCell key={"DeleteIcon"} align="center">
+                        <div
+                          onClick={() => {
+                            setOpenDeleteModal(true);
+                            setSelectedUser(user);
+                          }}
+                        >
+                          <DeleteIcon
+                            sx={{ cursor: "pointer" }}
+                            htmlColor="Red"
+                          />
+                        </div>
+                      </TableCell>
+                    ) : (
+                      <TableCell key={"RestoreFromTrashIcon"} align="center">
+                        <div
+                          onClick={() => {
+                            setOpenDeleteModal(true);
+                            setSelectedUser(user);
+                          }}
+                        >
+                          <RestoreFromTrashIcon
+                            sx={{ cursor: "pointer" }}
+                            htmlColor="green"
+                          />
+                        </div>
+                      </TableCell>
+                    )}
+                    {/* End of Actions Region (Edit/Delete/Rrcover User) */}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            <Pagination pagination={pagination} />
+          </TableContainer>
+        ) : (
+          <></>
+        )}
+        <Button
+          variant="contained"
+          onClick={() => {
+            setSelectedUser({});
+            setOpenUserModal(true);
+          }}
+          color="primary"
+        >
           Add User
         </Button>
         <Button variant="contained" color="error" onClick={deleteAllHandler}>

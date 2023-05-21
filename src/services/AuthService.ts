@@ -2,7 +2,8 @@ import axios from "axios";
 
 const API_URL = "https://localhost:7059";
 
-const login = (login: string, password: string) => {
+// TODO if login or password is undefined return error and not make the API call
+const login = (login: string | undefined, password: string | undefined) => {
   const formData = {
     login,
     password,

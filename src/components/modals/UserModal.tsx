@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Modal, TextField, MenuItem, Card, Grid } from "@mui/material";
-import { IUserForm, Status } from "../../utils/interfaces/IUser";
-import { createUser } from "../../services/UsersService";
+import { IUser, IUserForm, Status } from "../../utils/interfaces/IUser";
+import { createUser, editUser } from "../../services/UsersService";
 import authService from "../../services/AuthService";
 import { useNavigate } from "react-router-dom";
+import { mapUserToUserForm } from "../../utils/functions/UserUtils";
 
 interface IUserModalProps {
+  user?: Partial<IUser>;
   open: boolean;
   onClose: () => void;
 }
@@ -21,8 +23,9 @@ const style = {
   p: 4,
 };
 
-const UserModal: React.FC<IUserModalProps> = ({ open, onClose }) => {
-  const [userForm, setUserForm] = useState<IUserForm>({
+const UserModal: React.FC<IUserModalProps> = ({ user, open, onClose }) => {
+  const [editMode, setEditMode] = useState<boolean>(false);
+  const [userForm, setUserForm] = useState<Partial<IUserForm>>({
     name: "",
     login: "",
     password: "",
@@ -34,6 +37,15 @@ const UserModal: React.FC<IUserModalProps> = ({ open, onClose }) => {
   });
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user?.login) {
+      setUserForm(mapUserToUserForm(user));
+      setEditMode(true);
+    } else {
+      setEditMode(false);
+    }
+  }, [user]);
 
   const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -61,7 +73,11 @@ const UserModal: React.FC<IUserModalProps> = ({ open, onClose }) => {
   };
 
   const handleSubmit = async () => {
-    await createUser(userForm);
+    if (!editMode) {
+      await createUser(userForm);
+    } else {
+      await editUser(userForm);
+    }
 
     await handleFormSubmit();
 
@@ -70,12 +86,25 @@ const UserModal: React.FC<IUserModalProps> = ({ open, onClose }) => {
     }, 1000);
   };
 
+  const resetFields = () => {
+    setUserForm({
+      name: "",
+      login: "",
+      password: "",
+      email: "",
+      phone: "",
+      cpf: "",
+      dateOfBirth: "",
+      motherName: "",
+    });
+  };
+
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={() => {resetFields(); onClose();}}>
       <Card sx={style}>
         <Grid container spacing={2} justifyContent="flex-start">
           <Grid item xs={12}>
-            <h2>Create User</h2>
+            <h2>{!editMode ? "Create User" : `Edit User ${user?.name}`}</h2>
           </Grid>
           <Grid item xs={6}>
             <TextField
