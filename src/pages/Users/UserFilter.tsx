@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import IUserFilter from "../../utils/interfaces/IUserFilter";
 import { Status } from "../../utils/interfaces/IUser";
+import AgeRangeField from "../../components/shared/AgeRangeField";
 
 interface UserFilterProps {
   onFilter: (filters: IUserFilter) => void;
@@ -26,6 +27,10 @@ const UserFilter: React.FC<UserFilterProps> = ({ onFilter }) => {
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
+  };
+
+  const handleAgeChange = (startAge: number | undefined, endAge: number | undefined) => {
+    setFilters((prevFilters) => ({ ...prevFilters, startAge: startAge, endAge: endAge }));
   };
 
   const handleStatusChange = (event: SelectChangeEvent) => {
@@ -133,24 +138,8 @@ const UserFilter: React.FC<UserFilterProps> = ({ onFilter }) => {
         />
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>
-        <TextField
-          name="startAge"
-          label="Start Age"
-          fullWidth
-          value={filters.startAge || ""}
-          onChange={handleFilterChange}
-        />
+        <AgeRangeField onChange={handleAgeChange}/>
       </Grid>
-      <Grid item xs={12} sm={6} md={4} lg={3}>
-        <TextField
-          name="endAge"
-          label="End Age"
-          fullWidth
-          value={filters.endAge || ""}
-          onChange={handleFilterChange}
-        />
-      </Grid>
-      {/* TODO status not showing when i select inactive */}
       <Grid item xs={12} sm={6} md={4} lg={3}>
         <FormControl fullWidth>
           <InputLabel id="demo-simple-select-label">Status</InputLabel>
