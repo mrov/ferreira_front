@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, TextField, MenuItem, Card, Grid } from "@mui/material";
-import { IUser, IUserForm, Status } from "../../utils/interfaces/IUser";
+import { Button, Modal, TextField, Card, Grid } from "@mui/material";
+import { IUser, IUserForm } from "../../utils/interfaces/IUser";
 import { createUser, editUser } from "../../services/UsersService";
 import authService from "../../services/AuthService";
 import { useNavigate } from "react-router-dom";
@@ -100,7 +100,13 @@ const UserModal: React.FC<IUserModalProps> = ({ user, open, onClose }) => {
   };
 
   return (
-    <Modal open={open} onClose={() => {resetFields(); onClose();}}>
+    <Modal
+      open={open}
+      onClose={() => {
+        resetFields();
+        onClose();
+      }}
+    >
       <Card sx={style}>
         <Grid container spacing={2} justifyContent="flex-start">
           <Grid item xs={12}>

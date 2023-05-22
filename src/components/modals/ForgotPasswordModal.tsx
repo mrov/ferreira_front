@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 // Components
-import { Modal, Button, TextField, Box, Card, Grid } from "@mui/material";
+import { Modal, Button, TextField, Card, Grid } from "@mui/material";
 import { recoverPassword } from "../../services/AuthService";
 
 interface ForgotPasswordModalProps {
@@ -24,7 +24,7 @@ const style = {
 const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
   open,
   onClose,
-  onResetPasswordSuccess
+  onResetPasswordSuccess,
 }) => {
   const [login, setLogin] = useState("");
   const [birthDate, setBirthDate] = useState("");
@@ -35,47 +35,40 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
 
   const handleResetPassword = async () => {
     try {
-      // Perform validation
-      if (login.trim() === '') {
-        setLoginError('Login is required');
+      if (login.trim() === "") {
+        setLoginError("Login is required");
         return;
       }
-      if (birthDate.trim() === '') {
-        setBirthDateError('Birth Date is required');
+      if (birthDate.trim() === "") {
+        setBirthDateError("Birth Date is required");
         return;
       }
-      if (email.trim() === '') {
-        setEmailError('Email is required');
+      if (email.trim() === "") {
+        setEmailError("Email is required");
         return;
       }
 
-      // Make API call to recover password
       const response = await recoverPassword(login, birthDate, email);
 
-      console.log(response)
+      console.log(response);
 
       if (response.status === 200) {
-        // Reset the state and close the modal after successful verification
-        setLogin('');
-        setBirthDate('');
-        setEmail('');
-        setLoginError('');
-        setBirthDateError('');
-        setEmailError('');
+        setLogin("");
+        setBirthDate("");
+        setEmail("");
+        setLoginError("");
+        setBirthDateError("");
+        setEmailError("");
         onResetPasswordSuccess(response.data.newPassword);
       }
 
       // TODO else call an alert saying that any field is invalid
-
-      
     } catch (error) {
       console.error(error);
-      // Handle error (e.g., display error message)
     }
   };
 
   const handleClose = () => {
-    // Reset the state and close the modal
     setLogin("");
     setBirthDate("");
     setEmail("");

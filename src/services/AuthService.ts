@@ -17,11 +17,9 @@ const login = (login: string | undefined, password: string | undefined) => {
     body: JSON.stringify(formData),
   })
     .then((response) => {
-      // Handle the API response
       return response;
     })
     .catch((error) => {
-      // Handle any error that occurred during the request
       throw error;
     });
 };
@@ -38,7 +36,7 @@ export const recoverPassword = async (
       Email: email,
     });
 
-    return response; // You can handle the response data as needed
+    return response;
   } catch (error: any) {
     throw new Error(
       error.response?.data?.message || "Failed to recover password"

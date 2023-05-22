@@ -8,7 +8,11 @@ interface PaginationProps {
   onPrevPagination: () => void;
 }
 
-export default function Pagination({ pagination, onNextPagination, onPrevPagination }: PaginationProps) {
+export default function Pagination({
+  pagination,
+  onNextPagination,
+  onPrevPagination,
+}: PaginationProps) {
   return (
     <div
       style={{

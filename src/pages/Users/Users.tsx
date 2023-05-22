@@ -1,9 +1,3 @@
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
 import Header from "../../components/shared/Header";
 import UserFilter from "./UserFilter";
 import { IUser, IUserPagination, Status } from "../../utils/interfaces/IUser";
@@ -15,7 +9,17 @@ import {
   editUserStatus,
   getUserData,
 } from "../../services/UsersService";
-import { Button, Card, Grid } from "@mui/material";
+import {
+  Button,
+  Card,
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
 
 import CreateIcon from "@mui/icons-material/Create";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -27,19 +31,19 @@ import UserModal from "../../components/modals/UserModal";
 import Pagination from "../../components/shared/Pagination";
 import { getStatusName } from "../../utils/functions/UserUtils";
 
-const translateColumns : any = {
-  "cpf": "CPF",
-  "dateOfBirth": "Date of Birth",
-  "email": "Email",
-  "id": "ID",
-  "insertedAt": "Inserted At",
-  "login": "Login",
-  "motherName": "Mother's Name",
-  "name": "Name",
-  "phone": "Phone",
-  "status": "Status",
-  "updatedAt": "Updated At"
-}
+const translateColumns: any = {
+  cpf: "CPF",
+  dateOfBirth: "Date of Birth",
+  email: "Email",
+  id: "ID",
+  insertedAt: "Inserted At",
+  login: "Login",
+  motherName: "Mother's Name",
+  name: "Name",
+  phone: "Phone",
+  status: "Status",
+  updatedAt: "Updated At",
+};
 
 function mapColumns(user: any): string[] {
   const columns: string[] = [];
@@ -90,7 +94,6 @@ function User() {
       }
     } catch (error) {
       console.error(error);
-      // Handle error here
     }
   };
 
@@ -171,7 +174,7 @@ function User() {
 
         {users.length ? (
           <>
-              <h2 style={{marginTop: 0}}>Usuários</h2>
+            <h2 style={{ marginTop: 0 }}>Usuários</h2>
             <TableContainer component={Card}>
               <Table sx={{ minWidth: 650 }} aria-label="simple table">
                 <TableHead>
