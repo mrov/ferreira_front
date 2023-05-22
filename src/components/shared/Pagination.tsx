@@ -4,9 +4,11 @@ import { IUserPagination } from "../../utils/interfaces/IUser";
 
 interface PaginationProps {
   pagination: Omit<IUserPagination, "users"> | undefined;
+  onNextPagination: () => void;
+  onPrevPagination: () => void;
 }
 
-export default function Pagination({ pagination }: PaginationProps) {
+export default function Pagination({ pagination, onNextPagination, onPrevPagination }: PaginationProps) {
   return (
     <div
       style={{
@@ -17,7 +19,7 @@ export default function Pagination({ pagination }: PaginationProps) {
       }}
     >
       {pagination?.currentPage && pagination?.currentPage > 1 ? (
-        <div style={{ cursor: "pointer" }}>
+        <div style={{ cursor: "pointer" }} onClick={onPrevPagination}>
           <ArrowBackIosIcon htmlColor="blue"></ArrowBackIosIcon>
         </div>
       ) : (
@@ -30,7 +32,7 @@ export default function Pagination({ pagination }: PaginationProps) {
 
       {pagination?.currentPage &&
       pagination?.currentPage < pagination.totalPages ? (
-        <div style={{ cursor: "pointer" }}>
+        <div style={{ cursor: "pointer" }} onClick={onNextPagination}>
           <ArrowForwardIosIcon htmlColor="blue"></ArrowForwardIosIcon>
         </div>
       ) : (

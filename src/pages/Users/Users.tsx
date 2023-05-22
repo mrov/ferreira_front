@@ -10,23 +10,42 @@ import { IUser, IUserPagination, Status } from "../../utils/interfaces/IUser";
 import { useEffect, useState } from "react";
 import IUserFilter from "../../utils/interfaces/IUserFilter";
 
-import { deleteAllUsers, editUserStatus, getUserData } from "../../services/UsersService";
+import {
+  deleteAllUsers,
+  editUserStatus,
+  getUserData,
+} from "../../services/UsersService";
 import { Button, Card, Grid } from "@mui/material";
 
 import CreateIcon from "@mui/icons-material/Create";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RestoreFromTrashIcon from "@mui/icons-material/RestoreFromTrash";
+import BlockIcon from "@mui/icons-material/Block";
 
 import DeleteUserModal from "../../components/modals/DeleteUserModal";
 import UserModal from "../../components/modals/UserModal";
 import Pagination from "../../components/shared/Pagination";
 import { getStatusName } from "../../utils/functions/UserUtils";
 
+const translateColumns : any = {
+  "cpf": "CPF",
+  "dateOfBirth": "Date of Birth",
+  "email": "Email",
+  "id": "ID",
+  "insertedAt": "Inserted At",
+  "login": "Login",
+  "motherName": "Mother's Name",
+  "name": "Name",
+  "phone": "Phone",
+  "status": "Status",
+  "updatedAt": "Updated At"
+}
+
 function mapColumns(user: any): string[] {
   const columns: string[] = [];
   for (const key in user) {
     if (Object.prototype.hasOwnProperty.call(user, key)) {
-      columns.push(key);
+      columns.push(translateColumns[key]);
     }
   }
   return columns;
@@ -35,7 +54,7 @@ function mapColumns(user: any): string[] {
 function User() {
   const [users, setUsers] = useState<IUser[]>([]);
   const [pagination, setPagination] =
-    useState<Omit<IUserPagination, "users">>();
+    useState<Omit<Partial<IUserPagination>, "users">>();
   const [columns, setColumns] = useState<string[]>([]);
   const [filters, setFilters] = useState<IUserFilter>({
     status: Status.Active,
@@ -59,6 +78,15 @@ function User() {
         setUsers(users);
         setPagination(paginationInfo);
         setColumns(mapColumns(users[0]));
+        if (
+          filters.pageNumber &&
+          paginationInfo.totalPages < filters.pageNumber
+        ) {
+          setFilters((prevFilter) => ({
+            ...prevFilter,
+            pageNumber: pagination?.totalPages,
+          }));
+        }
       }
     } catch (error) {
       console.error(error);
@@ -91,6 +119,21 @@ function User() {
     }
   };
 
+  // mode can recieve "next" or "prev"
+  const updatePagination = (mode: string): void => {
+    if (mode === "next") {
+      setFilters((prevFilter) => ({
+        ...prevFilter,
+        pageNumber: pagination?.currentPage + 1,
+      }));
+    } else if (mode === "prev") {
+      setFilters((prevFilter) => ({
+        ...prevFilter,
+        pageNumber: pagination?.currentPage - 1,
+      }));
+    }
+  };
+
   return (
     <>
       <DeleteUserModal
@@ -101,7 +144,6 @@ function User() {
         }}
         onDelete={async function (): Promise<void> {
           await fetchUserData();
-          console.log('a')
           setOpenDeleteModal(false);
         }}
       />
@@ -119,99 +161,143 @@ function User() {
 
       <Grid item xs={12} sx={{ p: 3 }}>
         <Grid item xs={12}>
+          <h2>Filtros</h2>
           <UserFilter
             onFilter={function (filters: IUserFilter): void {
-              setFilters(filters);
+              setFilters((prevFilter) => ({ ...prevFilter, ...filters }));
             }}
           />
         </Grid>
 
         {users.length ? (
-          <TableContainer component={Card}>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  {columns.map((column) => (
-                    <TableCell align="center" key={column}>
-                      {column}
-                    </TableCell>
-                  ))}
-                  <>
-                    <TableCell align="center" key={"EditHeader"}>
-                      Edit
-                    </TableCell>
-                    <TableCell align="center" key={"DeleteHeader"}>
-                      Delete
-                    </TableCell>
-                  </>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {users.map((user: IUser) => (
-                  <TableRow
-                    key={user.id}
-                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                  >
-                    {Object.keys(user).map((property) =>
-                      renderProperty(
-                        user.id,
-                        user[property as keyof IUser],
-                        property
-                      )
-                    )}
+          <>
+              <h2 style={{marginTop: 0}}>Usuários</h2>
+            <TableContainer component={Card}>
+              <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    {columns.map((column) => (
+                      <TableCell align="center" key={column}>
+                        {column}
+                      </TableCell>
+                    ))}
+                    <>
+                      <TableCell align="center" key={"EditHeader"}>
+                        Edit
+                      </TableCell>
+                      <TableCell align="center" key={"DeleteHeader"}>
+                        Delete
+                      </TableCell>
+                      <TableCell align="center" key={"BlockHeader"}>
+                        Block
+                      </TableCell>
+                    </>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {users.map((user: IUser) => (
+                    <TableRow
+                      key={user.id}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      {Object.keys(user).map((property) =>
+                        renderProperty(
+                          user.id,
+                          user[property as keyof IUser],
+                          property
+                        )
+                      )}
 
-                    {/* TODO Turn this region another component Actions Region (Edit/Delete/Rrcover User) */}
-                    <TableCell key={"EditPencil"} align="center">
-                      <div
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setOpenUserModal(true);
-                        }}
-                      >
-                        <CreateIcon
-                          sx={{ cursor: "pointer" }}
-                          htmlColor="blue"
-                        />
-                      </div>
-                    </TableCell>
-                    {String(user.status) === Status.Active ? (
-                      <TableCell key={"DeleteIcon"} align="center">
+                      {/* TODO Turn this region another component Actions Region (Edit/Delete/Rrcover User) */}
+                      <TableCell key={"EditPencil"} align="center">
                         <div
                           onClick={() => {
-                            setOpenDeleteModal(true);
                             setSelectedUser(user);
+                            setOpenUserModal(true);
                           }}
                         >
-                          <DeleteIcon
+                          <CreateIcon
                             sx={{ cursor: "pointer" }}
-                            htmlColor="Red"
+                            htmlColor="blue"
                           />
                         </div>
                       </TableCell>
-                    ) : (
-                      <TableCell key={"RestoreFromTrashIcon"} align="center">
-                        <div
-                          onClick={async () => {
-                            await editUserStatus(user, Status.Active);
-                            console.log('a')
-                            fetchUserData();
-                          }}
-                        >
-                          <RestoreFromTrashIcon
-                            sx={{ cursor: "pointer" }}
-                            htmlColor="green"
-                          />
-                        </div>
-                      </TableCell>
-                    )}
-                    {/* End of Actions Region (Edit/Delete/Rrcover User) */}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                      {String(user.status) !== Status.Inactive ? (
+                        <TableCell key={"DeleteIcon"} align="center">
+                          <div
+                            onClick={() => {
+                              setOpenDeleteModal(true);
+                              setSelectedUser(user);
+                            }}
+                          >
+                            <DeleteIcon
+                              sx={{ cursor: "pointer" }}
+                              htmlColor="Red"
+                            />
+                          </div>
+                        </TableCell>
+                      ) : (
+                        <TableCell key={"RestoreFromTrashIcon"} align="center">
+                          <div
+                            onClick={async () => {
+                              await editUserStatus(user, Status.Active);
+                              fetchUserData();
+                            }}
+                          >
+                            <RestoreFromTrashIcon
+                              sx={{ cursor: "pointer" }}
+                              htmlColor="green"
+                            />
+                          </div>
+                        </TableCell>
+                      )}
+                      {String(user.status) !== Status.Blocked ? (
+                        <TableCell key={"Block"} align="center">
+                          <div
+                            onClick={async () => {
+                              await editUserStatus(user, Status.Blocked);
+                              fetchUserData();
+                            }}
+                          >
+                            <BlockIcon
+                              sx={{ cursor: "pointer" }}
+                              htmlColor="red"
+                            />
+                          </div>
+                        </TableCell>
+                      ) : (
+                        <TableCell key={"RestoreBlock"} align="center">
+                          <div
+                            onClick={async () => {
+                              await editUserStatus(user, Status.Active);
+                              fetchUserData();
+                            }}
+                          >
+                            <BlockIcon
+                              sx={{ cursor: "pointer" }}
+                              htmlColor="green"
+                            />
+                          </div>
+                        </TableCell>
+                      )}
 
-            <Pagination pagination={pagination} />
-          </TableContainer>
+                      {/* End of Actions Region (Edit/Delete/Rrcover User) */}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+
+              <Pagination
+                pagination={pagination}
+                onNextPagination={function (): void {
+                  updatePagination("next");
+                }}
+                onPrevPagination={function (): void {
+                  updatePagination("prev");
+                }}
+              />
+            </TableContainer>
+          </>
         ) : (
           <></>
         )}
