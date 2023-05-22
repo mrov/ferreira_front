@@ -6,6 +6,11 @@ Ferreira Challenge Front is a React application built with Vite.
 
 A challenge for a job opportunity this is the front end and the https://github.com/mrov/Ferreira_Challenge project is the back-end
 
+# Back-end
+
+This project is poiting to "https://localhost:7059" if you need to change that you have to go to both service files (src/services) and change the main variable in both files.
+Next steps is to param this value into a env file.
+
 # Installation
 
 1 - Clone the repository: git clone https://github.com/mrov/ferreira_front
